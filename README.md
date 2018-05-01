@@ -1,5 +1,7 @@
 # Image-wall
 
+demo url  https://chantelle-zhang.github.io/Image-wall/
+
 This is an object oriented image wall component  .you can pass parameters to generate an image wall with customized image height,width,rows,collums.just like this:
 var imgwall=new Imgwall($("#container"), {
 		imgArr: imgArr1,
