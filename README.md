@@ -13,6 +13,8 @@ var imgwall=new Imgwall($("#container"), {
 
 you can drag and drop the images to change the orders , or can click the 'image rearrange' button to automaticaly reorder the images.
 
+you can click on Images to see oringinal size image.
+
 there is a little bug under safari browers still waiting to be solved ,so please test with chrome and firefox first.
 
 I am a new programmer so i am still learning to improve my code.
