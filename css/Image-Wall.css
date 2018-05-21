@@ -26,10 +26,9 @@ button {
 }
 a {
 	display: block;
-	float: left;
+	position:absolute;
 }
 #wrap img {
-	position: absolute;
-}
+	
 
 

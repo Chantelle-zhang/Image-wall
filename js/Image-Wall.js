@@ -15,7 +15,7 @@ function Imgwall(id, options) {
 	this.disy = 0;
 	this.imageIndex = [];
 	this.$a = '';
-	this.$img = '';
+	this.index=''
 	this.index1 = '';
 	this.init();
 
@@ -37,7 +37,7 @@ Imgwall.prototype.createHtml = function () {
 	var str = '';
 	for (var i = 0; i < this.opts.imgArr.length; i++) {
 
-		str = str + '<a target="_blank" href="' + this.opts.imgArr[i] + '"><img src="' + this.opts.imgArr[i] + '" index="' + i + '" width="' + this.opts.imgWidth + '" height="' + this.opts.imgHeight + '"></a>';
+		str = str + '<a target="_blank" href="' + this.opts.imgArr[i] +'" index="' + i+ '"><img src="' + this.opts.imgArr[i] + '"   width="' + this.opts.imgWidth + '" height="' + this.opts.imgHeight + '"></a>';
 		this.imageIndex.push(i); /* created index property  for images and push index values to an array*/
 
 	}
@@ -49,11 +49,15 @@ Imgwall.prototype.createHtml = function () {
 		'height': this.opts.imgHeight * this.opts.rows
 	});
 	this.$a = $("#wrap a");
-	this.$a.css({
-		'width': this.opts.imgWidth,
-		'height': this.opts.imgHeight
-	});
 
+	for (var j = 0; j < this.opts.imgArr.length; j++){
+    this.$a.eq(j).css({
+		
+		left:(j%this.opts.cols)*this.opts.imgWidth,
+		top:Math.floor(j/this.opts.rows)*this.opts.imgHeight
+		
+	});
+	}
 }
 
 
@@ -61,19 +65,18 @@ Imgwall.prototype.createHtml = function () {
 
 Imgwall.prototype.drag = function () {
 
-
-	this.$img = $("#wrap img");
+    this.$a = $("#wrap a");
 
 	var This = this;
 
-	this.$img.on("mousedown", function (event) {
+	this.$a.on("mousedown", function (event) {
 
 		event.preventDefault();
 
 		This.disx = event.pageX - $(this).offset().left;
 
 		This.disy = event.pageY - $(this).offset().top;
-		console.log(This.disx)
+
 
 		$this = $(this);
 
@@ -82,7 +85,7 @@ Imgwall.prototype.drag = function () {
 
 		$(document).on("mousemove", function (event) {
 
-			This.$a.on("click", function () {
+			$this.on("click", function () {
 
 				return false;
 
@@ -120,21 +123,29 @@ Imgwall.prototype.drag = function () {
 
 			$this.css('z-index', '999');
 
-			var index = This.indexOfImageToExchange($this);
+			This.index = This.indexOfImageToExchange($this);
 
-			This.$img.css('opacity', '1');
+			This.$a.css('opacity', '1');
 
-			var $index2 = "index='" + index + "'"
+			var $index2 = "index='" + This.index + "'"
 
-			$("img[" + $index2 + "]").css('opacity', '0.5');
+			$("a[" + $index2 + "]").css('opacity', '0.5');
 
 			$this.css('opacity', '1');
 
-			if (event.pageX <= 0 || event.pageX >= $(window).innerWidth() || event.pageY <= 0 || event.pageY >= $(window).innerHeight()) {
+			if (event.pageX <= 0 || event.pageX >= ($(window).innerWidth()-1 )|| event.pageY <= 0 || event.pageY >= ($(window).innerHeight()-1) ){
+
 
 				$(document).off("mousemove");
+				/* if mouse is off the above margin , move image back automatically */
 
-				This.imageExchange($this);
+                var $left=(This.index%This.opts.cols)*This.opts.imgWidth
+                var $top=Math.floor(This.index/This.opts.rows)*This.opts.imgHeight
+
+                $this.animate({
+                    left: $left,
+                    top: $top
+                }, 200);
 
 
 			}
@@ -160,7 +171,7 @@ Imgwall.prototype.drag = function () {
 
 		if (event.target.nodeName == 'IMG') {
 
-			This.imageExchange($(event.target));
+			This.imageExchange($(event.target.parentNode));
 		}
 
 
@@ -168,7 +179,7 @@ Imgwall.prototype.drag = function () {
 
 	})
 
-	this.$img.on("contextmenu", function () {
+	this.$a.on("contextmenu", function () {
 		return false;
 	});
 
@@ -186,11 +197,11 @@ Imgwall.prototype.drag = function () {
 
 Imgwall.prototype.imageExchange = function (obj) {
 
-	var index = this.indexOfImageToExchange(obj); /* find the index of the rignt image to be exchanged*/
 
-	var $left = this.$a.eq(index).position().left + 'px';
-
-	var $top = this.$a.eq(index).position().top + 'px';
+	//var index = this.indexOfImageToExchange(obj); /* find the index of the rignt image to be exchanged*/
+	
+		var $left=(this.index%this.opts.cols)*this.opts.imgWidth
+		var $top=Math.floor(this.index/this.opts.rows)*this.opts.imgHeight
 
 	obj.animate({
 		left: $left,
@@ -199,14 +210,15 @@ Imgwall.prototype.imageExchange = function (obj) {
 
 	obj.css('opacity', '1');
 
-	var t = index;
 
-	var $index2 = "index='" + index + "'";
+	var $index2 = "index='" + this.index + "'";
 
-	$left = this.$a.eq(this.index1).position().left;
-	$top = this.$a.eq(this.index1).position().top;
-	$("img[" + $index2 + "]").css('opacity', '1');
-	$("img[" + $index2 + "]").animate({
+		$left=(this.index1%this.opts.cols)*this.opts.imgWidth
+		$top=Math.floor(this.index1/this.opts.rows)*this.opts.imgHeight
+		
+		
+	$("a[" + $index2 + "]").css('opacity', '1');
+	$("a[" + $index2 + "]").animate({
 		left: $left,
 		top: $top
 	}, 200);
@@ -214,15 +226,15 @@ Imgwall.prototype.imageExchange = function (obj) {
 
 	setTimeout(zindex, 250, obj);
 
-	$("img[" + $index2 + "]").attr('index', this.index1);
+	$("a[" + $index2 + "]").attr('index', this.index1);
 
-	obj.attr('index', index);
+	obj.attr('index', this.index);
 
 	/* exchange the value of index property , and updates the imageIndex Array*/
 	var $index1 = "index='" + this.index1 + "'";
-	var n = $("img").index($("[" + $index2 + "]"));
-	var m = $("img").index($("[" + $index1 + "]"));
-	this.imageIndex[n] = index;
+	var n = $("a").index($("[" + $index2 + "]"));
+	var m = $("a").index($("[" + $index1 + "]"));
+	this.imageIndex[n] = this.index;
 
 	this.imageIndex[m] = this.index1;
 
@@ -233,7 +245,7 @@ Imgwall.prototype.imageExchange = function (obj) {
 
 Imgwall.prototype.indexOfImageToExchange = function (obj) {
 
-
+    
 	var index = '';
 
 	var $rowIndex = Math.round(obj.position().left / this.opts.imgWidth);
@@ -250,20 +262,19 @@ Imgwall.prototype.indexOfImageToExchange = function (obj) {
 
 Imgwall.prototype.sort = function () {
 	/* radomnize the imageIndex array  and  move the images to new place accordingly*/
-
+this.$a = $("#wrap a");
 	this.imageIndex.sort(function (a, b) {
 		return 0.5 - Math.random()
 	});
 
 	for (var i = 0; i < this.imageIndex.length; i++) {
 
-		this.$img.eq(i).attr('index', this.imageIndex[i]);
+		this.$a.eq(i).attr('index', this.imageIndex[i]);
+		var $left=(this.imageIndex[i]%this.opts.cols)*this.opts.imgWidth
+		var $top=Math.floor(this.imageIndex[i]/this.opts.rows)*this.opts.imgHeight
+	
 
-		var $left = this.$a.eq(this.imageIndex[i]).position().left + 'px';
-
-		var $top = this.$a.eq(this.imageIndex[i]).position().top + 'px';
-
-		this.$img.eq(i).animate({
+		this.$a.eq(i).animate({
 			left: $left,
 			top: $top
 		}, 200);
