@@ -65,8 +65,6 @@ Imgwall.prototype.createHtml = function () {
 
 Imgwall.prototype.drag = function () {
 
-    this.$a = $("#wrap a");
-
 	var This = this;
 
 	this.$a.on("mousedown", function (event) {
@@ -197,8 +195,6 @@ Imgwall.prototype.drag = function () {
 
 Imgwall.prototype.imageExchange = function (obj) {
 
-
-	//var index = this.indexOfImageToExchange(obj); /* find the index of the rignt image to be exchanged*/
 	
 		var $left=(this.index%this.opts.cols)*this.opts.imgWidth
 		var $top=Math.floor(this.index/this.opts.rows)*this.opts.imgHeight
@@ -262,7 +258,6 @@ Imgwall.prototype.indexOfImageToExchange = function (obj) {
 
 Imgwall.prototype.sort = function () {
 	/* radomnize the imageIndex array  and  move the images to new place accordingly*/
-this.$a = $("#wrap a");
 	this.imageIndex.sort(function (a, b) {
 		return 0.5 - Math.random()
 	});
